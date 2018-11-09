@@ -1,3 +1,3 @@
 Some explanations that I don't want to repeat anymore.
 
-* The [easiest way to make a full stack REST node json endpoint app, frontend and backend].
+* The [easiest way to make a full stack REST node json endpoint app, frontend and backend](https://stonecypher.github.io/explanations/EasiestNodeEndpoint/).

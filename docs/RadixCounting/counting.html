@@ -1,0 +1,127 @@
+<!doctype html>
+<html><head><script type="text/javascript">
+
+
+
+/********
+ * Get the next counter from the previous
+ * next_counter( [3,2,1], 4 ) -> [0,3,1]
+ */
+
+function next_counter(counter, digit_cap) {
+
+  const counterLength = counter.length,            // we use this a lot so cache it
+        iCounter      = new Array(counterLength);  // the new counter
+
+  let   bumpNext      = true,                      // always bump the first digit
+        whichDigit;                                // cursor in digits of number
+
+  // go over all the digits once, least-significant to most-sig
+  for (whichDigit = 0; whichDigit < counterLength; ++whichDigit) {
+
+    // if the previous step said bump, or always at first, then increment this digit by one
+    iCounter[whichDigit] = counter[whichDigit] + (bumpNext? 1 : 0);
+
+    // if this digit has gone over
+    if (iCounter[whichDigit] >= digit_cap) {
+      iCounter[whichDigit] = 0;               // reset it
+      bumpNext = true;                        // mark to bump next
+    } else {                                // otherwise
+      bumpNext = false;                       // mark not to bump next
+    }
+
+  }
+
+  // if bumpNext is on at the end, the last digit overflowed; return false because no counter remains
+  return bumpNext? false : iCounter;
+
+}
+
+
+
+function all_counters(length, digit_cap, transformer) {
+
+  const output = [];                                               // make a list
+
+  let counter = new Array(length).fill(0);                         // make the first counter
+  output.push(counter);                                            // put it in the list
+
+  while (counter = next_counter(counter, digit_cap)) {             // keep getting new counters
+    output.push(counter);                                          // and putting them in the list
+  }                                                                // until there aren't any left
+
+  const transform_one_row = row => row.map(transformer).join('');  // if a string transform is offered, use it then join on ''
+  return transformer? output.map(transform_one_row) : output;      // transform those to your letters
+
+}
+
+
+
+
+// It seems like your radix is all capital letters then all lower case, so,
+// put the relevant letters in a string, and take that character as a string.
+
+function ch_transform(digit, chs) {
+  return chs[digit];
+}
+
+
+
+
+
+function byId(id) { return document.getElementById(id); }
+
+
+
+
+
+function update() {
+
+  const tgt           = byId('tgt');
+        tgt.innerHTML = '';
+
+  const chset         = (byId('chset').value) || "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+        len           = Number(byId('digits').value);
+
+  const ctrs = all_counters(len, chset.length, digit => ch_transform(digit, chset));
+
+  ctrs.map(ctr => {
+
+    let li           = document.createElement('li');
+        li.innerHTML = ctr;
+
+    tgt.appendChild(li);
+
+  });
+
+}
+
+
+
+
+
+window.onload = () => update();
+
+
+
+
+
+</script></head><body>
+
+  <table>
+
+    <tr>
+      <th>Digits</th>
+      <td><input type="number" id="digits" min="1" step="1" value="2" onchange="update();" /></td>
+    </tr>
+
+    <tr>
+      <th>Characters</th>
+      <td><input type="text" id="chset" value="ABC" onkeyup="update();" /></td>
+    </tr>
+
+  </table>
+
+  <ul id="tgt"></ul>
+
+</body></html>
